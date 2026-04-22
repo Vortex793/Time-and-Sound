@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
@@ -13,7 +14,8 @@ namespace Time_and_Sound
         SpriteFont timeFont;
         float seconds;
         MouseState mouseState;
-
+        SoundEffect explode;
+        bool exploded;
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -28,20 +30,24 @@ namespace Time_and_Sound
         {
             // TODO: Add your initialization logic here
 
-            base.Initialize();
+           
             bombRect = new Rectangle(50, 50, 700, 400);
 
             seconds = 0;
+            exploded = false;
+            base.Initialize();
         }
 
         protected override void LoadContent()
         {
 
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-            timeFont = Content.Load<SpriteFont>("TimeFont");
+       
 
             // TODO: use this.Content to load your game content here
             bombTexture = Content.Load<Texture2D>("bomb");
+            explode = Content.Load<SoundEffect>("explosion");
+            timeFont = Content.Load<SpriteFont>("TimeFont");
 
         }
 
@@ -53,11 +59,17 @@ namespace Time_and_Sound
 
             // TODO: Add your update logic here
             seconds += (float)gameTime.ElapsedGameTime.TotalSeconds;
-            if (seconds > 10)
+            if (seconds > 15)
                     seconds = 0f;
 
             if (mouseState.LeftButton == ButtonState.Pressed)
                 seconds = 0f;
+            
+            if (seconds >= 15)
+            {
+                explode.Play();
+                seconds = 0f;
+            }
 
 
 

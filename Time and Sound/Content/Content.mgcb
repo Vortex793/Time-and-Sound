@@ -28,6 +28,12 @@
 #begin digitalFont.ttf
 /copy:digitalFont.ttf
 
+#begin explosion.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:explosion.wav
+
 #begin timeFont.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
