@@ -10,12 +10,21 @@ namespace Time_and_Sound
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
         Texture2D bombTexture;
+        Texture2D explosionTexture;
         Rectangle bombRect;
+        Rectangle resetButton;
+        Rectangle wireRect;
+
         SpriteFont timeFont;
         float seconds;
         MouseState mouseState;
+
         SoundEffect explode;
+        SoundEffectInstance explodeInstance;
+
         bool exploded;
+        bool defused = false;
+      
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -24,6 +33,7 @@ namespace Time_and_Sound
 
             _graphics.PreferredBackBufferWidth = 800;  
             _graphics.PreferredBackBufferHeight = 500;   
+            _graphics.ApplyChanges();
         }
 
         protected override void Initialize()
@@ -32,6 +42,8 @@ namespace Time_and_Sound
 
            
             bombRect = new Rectangle(50, 50, 700, 400);
+            resetButton = new Rectangle(300, 350, 100, 50);
+            wireRect = new Rectangle(300, 300, 100, 50);
 
             seconds = 0;
             exploded = false;
@@ -46,8 +58,12 @@ namespace Time_and_Sound
 
             // TODO: use this.Content to load your game content here
             bombTexture = Content.Load<Texture2D>("bomb");
-            explode = Content.Load<SoundEffect>("explosion");
             timeFont = Content.Load<SpriteFont>("TimeFont");
+            explosionTexture = Content.Load<Texture2D>("explosionTexture");
+            explode = Content.Load<SoundEffect>("explosion");
+            explodeInstance = explode.CreateInstance();
+       
+        
 
         }
 
@@ -58,21 +74,30 @@ namespace Time_and_Sound
                 Exit();
 
             // TODO: Add your update logic here
-            seconds += (float)gameTime.ElapsedGameTime.TotalSeconds;
-            if (seconds > 15)
-                    seconds = 0f;
+            if (!exploded)
+                seconds += (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-            if (mouseState.LeftButton == ButtonState.Pressed)
-                seconds = 0f;
-            
-            if (seconds >= 15)
+            if (mouseState.LeftButton == ButtonState.Pressed && resetButton.Contains(mouseState.Position))
             {
-                explode.Play();
                 seconds = 0f;
+                exploded = false;
             }
 
+            if (seconds >= 15 && !exploded && !defused)
+            {
+                explodeInstance.Play();
 
+                exploded = true;
+           
+            }
 
+            if (exploded && explodeInstance.State == SoundState.Stopped)
+                Exit();
+
+            if (mouseState.LeftButton == ButtonState.Pressed && wireRect.Contains(mouseState.Position))
+            {
+                defused = true;
+            }
             base.Update(gameTime);
         }
 
@@ -83,11 +108,22 @@ namespace Time_and_Sound
             // TODO: Add your drawing code here
             _spriteBatch.Begin();
 
-            _spriteBatch.Draw(bombTexture, bombRect, Color.White);
-            _spriteBatch.DrawString(timeFont, seconds.ToString("00.0"), new Vector2(270, 200), Color.Black);
+            if (defused)
+            {
+                _spriteBatch.Draw(bombTexture, bombRect, Color.Green);
+                _spriteBatch.DrawString(timeFont, "DEFUSED", new Vector2(270, 200), Color.Green);
+            }
+            else if (!exploded)
+            {
+                _spriteBatch.Draw(bombTexture, bombRect, Color.White);
+                _spriteBatch.DrawString(timeFont, (15 - seconds).ToString("00.0"), new Vector2(270, 200), Color.Black);
+            }
+            else
+            {
+                _spriteBatch.Draw(explosionTexture, bombRect, Color.White);
+            }
 
             _spriteBatch.End();
-
             base.Draw(gameTime);
         }
     }
