@@ -11,9 +11,11 @@ namespace Time_and_Sound
         private SpriteBatch _spriteBatch;
         Texture2D bombTexture;
         Texture2D explosionTexture;
+        Texture2D pliersTexture;
         Rectangle bombRect;
         Rectangle resetButton;
         Rectangle wireRect;
+        Rectangle pliersRect;
 
         SpriteFont timeFont;
         float seconds;
@@ -29,7 +31,7 @@ namespace Time_and_Sound
         {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            IsMouseVisible = true;
+            IsMouseVisible = false;
 
             _graphics.PreferredBackBufferWidth = 800;  
             _graphics.PreferredBackBufferHeight = 500;   
@@ -44,6 +46,7 @@ namespace Time_and_Sound
             bombRect = new Rectangle(50, 50, 700, 400);
             resetButton = new Rectangle(300, 350, 100, 50);
             wireRect = new Rectangle(300, 300, 100, 50);
+            pliersRect = new Rectangle(0, 0, 50, 50);
 
             seconds = 0;
             exploded = false;
@@ -61,6 +64,7 @@ namespace Time_and_Sound
             timeFont = Content.Load<SpriteFont>("TimeFont");
             explosionTexture = Content.Load<Texture2D>("explosionTexture");
             explode = Content.Load<SoundEffect>("explosion");
+            pliersTexture = Content.Load<Texture2D>("pliers");
             explodeInstance = explode.CreateInstance();
        
         
@@ -70,6 +74,7 @@ namespace Time_and_Sound
         protected override void Update(GameTime gameTime)
         {
             mouseState = Mouse.GetState();
+            pliersRect.Location = mouseState.Position;
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
@@ -122,7 +127,7 @@ namespace Time_and_Sound
             {
                 _spriteBatch.Draw(explosionTexture, bombRect, Color.White);
             }
-
+            _spriteBatch.Draw(pliersTexture, pliersRect, Color.White);
             _spriteBatch.End();
             base.Draw(gameTime);
         }
